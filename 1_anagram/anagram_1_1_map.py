@@ -11,12 +11,9 @@ def find_anagram(path, random_word):
     for word in dictionary:
         key = ''.join(sorted(word))
         sorted_word_to_anagrams[key].append(word)
-    # ターゲットの単語をソートしてnew_dictionaryの中で検索
+    # ターゲットの単語をソートしてsorted_word_to_anagramsの中で検索
     sorted_word = ''.join(sorted(random_word))
     if sorted_word in sorted_word_to_anagrams:
         return sorted_word_to_anagrams[sorted_word]
     else:
         raise ValueError(f"No anagrams found for '{random_word}'")
-
-
-print(find_anagram('1_anagram/Words.txt', "kcba"))

@@ -1,6 +1,6 @@
 import unittest
 # ファイル名の先頭に数字を入れると無効なので注意
-from anagram_1_map import find_anagram
+from anagram_1_binary_search import find_anagram
 
 
 class test_find_anagram(unittest.TestCase):

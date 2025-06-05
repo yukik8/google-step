@@ -70,7 +70,7 @@ class Cache:
                 self.newest = node
 
             self.count += 1
-            # 規定サイズを超えた場合、最も古いキャッシュを削除
+            # 規定サイズを超えた場合、最も古いページを削除
             if self.count > self.size:
                 self.hash_table.delete(self.oldest.url)
                 self.oldest = self.oldest.next

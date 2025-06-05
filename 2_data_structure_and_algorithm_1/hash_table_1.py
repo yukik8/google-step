@@ -24,6 +24,7 @@ def calculate_hash(key):
     # 桁ごとに重み付けすることで衝突を減らす
     weight = 1
     for i in key:
+        # アルファベットが26個ありその近くの素数として29を採用
         weight = weight * 29
         hash += ord(i) * weight
     return hash
@@ -128,7 +129,6 @@ class HashTable:
             prev = item
             item = item.next
         return False
-        pass
 
     # 再ハッシュ
     def rehash(self, new_size):

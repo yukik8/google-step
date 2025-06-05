@@ -14,7 +14,7 @@ def find_anagram(path, random_word):
     # random_word
     sorted_word = ''.join(sorted(random_word))
     # ソートした辞書をめぐる式二分探索で解く
-    ok = len(sorted_dict_keys)
+    ok = len(sorted_dict_keys) - 1
     ng = -1
     while abs(ok - ng) > 1:
         mid = (ok + ng) // 2

@@ -8,19 +8,26 @@ from hash_table_1 import HashTable
 #       to implement the data structure yourself!
 
 
+class Node:
+    def __init__(self, url, contents):
+        self.url = url
+        self.contents = contents
+        self.prev = None
+        self.next = None
+
+
 class Cache:
     # Initialize the cache.
     # |n|: The size of the cache.
     def __init__(self, n):
         # ------------------------#
         # Write your code here!  #
-        # ------------------------#
         self.size = n
         self.hash_table = HashTable()
-        self.old = None
-        self.next = None
+        self.oldest = None
+        self.newest = None
         self.count = 0
-        pass
+        # ------------------------#
 
     # Access a page and update the cache so that it stores the most recently
     # accessed N pages. This needs to be done with mostly O(1).
@@ -29,22 +36,62 @@ class Cache:
     def access_page(self, url, contents):
         # ------------------------#
         # Write your code here!  #
+        node, found = self.hash_table.get(url)
+        # すでに存在している場合
+        if found:
+            # 指定nodeが末尾以外に存在している場合
+            if node != self.newest:
+                # 指定nodeが先頭に存在している場合
+                if node == self.oldest:
+                    self.oldest = self.oldest.next
+                    self.oldest.prev = None
+                # 指定nodeが中間に存在している場合
+                else:
+                    node.prev.next = node.next
+                    node.next.prev = node.prev
 
-        if self.hash_table.get(url)[1]:
-
+                node.prev = self.newest
+                node.next = None
+                self.newest.next = node
+                self.newest = node
+        # 新たにページを追加
         else:
+            node = Node(url, contents)
+            self.hash_table.put(url, node)
+            # 何も入っていないとき
+            if self.newest == None:
+                self.newest = node
+                self.oldest = node
+            else:
+                node.prev = self.newest
+                # 今のnewestのnextをnodeに繋げる
+                self.newest.next = node
+                # newestをnodeに更新
+                self.newest = node
 
-            # ------------------------#
-
-        pass
+            self.count += 1
+            # 規定サイズを超えた場合、最も古いキャッシュを削除
+            if self.count > self.size:
+                self.hash_table.delete(self.oldest.url)
+                self.oldest = self.oldest.next
+                if self.oldest:
+                    self.oldest.prev = None
+                self.count -= 1
+        # ------------------------#
 
     # Return the URLs stored in the cache. The URLs are ordered in the order
     # in which the URLs are mostly recently accessed.
+
     def get_pages(self):
         # ------------------------#
         # Write your code here!  #
+        pages = []
+        node = self.newest
+        while node:
+            pages.append(node.url)
+            node = node.prev
+        return pages
         # ------------------------#
-        pass
 
 
 def cache_test():

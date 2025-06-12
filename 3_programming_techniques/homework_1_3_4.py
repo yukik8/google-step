@@ -96,7 +96,6 @@ def evaluate(tokens):
     answer = 0
     tokens.insert(0, {'type': 'PLUS'})  # Insert a dummy '+' token
     index = 1
-
     while index < len(tokens):
         # かっこの中を再帰的に計算
         if tokens[index]['type'] == 'LEFT':
@@ -149,7 +148,7 @@ def evaluate(tokens):
     return answer
 
 
-def find_right_parenthesis(tokens, index):
+def find_right_parenthesis(tokens, index):  # 閉じかっこのindexを検索
     depth = 0
     for i in range(index, len(tokens)):
         if tokens[i]['type'] == 'LEFT':

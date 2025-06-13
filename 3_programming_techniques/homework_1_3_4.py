@@ -12,157 +12,91 @@ def read_number(line, index):
             number += int(line[index]) * decimal
             decimal /= 10
             index += 1
-    token = {'type': 'NUMBER', 'number': number}
-    return token, index
+    return number, index
 
 
-def read_plus(line, index):
-    token = {'type': 'PLUS'}
-    return token, index + 1
+def calculate(operation, left, right, index):
+    if operation in ('+', '-', '*', '/'):
+        if operation == '+':
+            ans = left + right
+        elif operation == '-':
+            ans = left - right
+        elif operation == '*':
+            ans = left * right
+        elif operation == '/':
+            ans = left / right
+    elif operation == 'a':
+        ans = abs(right)
+        index += 2
+    elif operation == 'i':
+        ans = int(right)
+        index += 2
+    elif operation == 'r':
+        ans = round(right)
+        index += 4
+    else:
+        print('Invalid character found: ' + operation)
+        exit(1)
+    return ans, index
 
 
-def read_minus(line, index):
-    token = {'type': 'MINUS'}
-    return token, index + 1
-
-
-def read_times(line, index):
-    token = {'type': 'TIMES'}
-    return token, index + 1
-
-
-def read_division(line, index):
-    token = {'type': 'DIVISION'}
-    return token, index + 1
-
-
-def read_left_parenthesis(line, index):
-    token = {'type': 'LEFT'}
-    return token, index + 1
-
-
-def read_right_parenthesis(line, index):
-    token = {'type': 'RIGHT'}
-    return token, index + 1
-
-
-def read_abs(line, index):
-    token = {'type': 'ABS'}
-    return token, index + 3
-
-
-def read_int(line, index):
-    token = {'type': 'INT'}
-    return token, index + 3
-
-
-def read_round(line, index):
-    token = {'type': 'ROUND'}
-    return token, index + 5
-
-
-def tokenize(line):
-    tokens = []
+# 操車場アルゴリズム
+def shunting_yard_algorithm(line):
+    stack = []
+    num_queue = []
     index = 0
     while index < len(line):
         if line[index].isdigit():
-            (token, index) = read_number(line, index)
-        elif line[index] == '+':
-            (token, index) = read_plus(line, index)
-        elif line[index] == '-':
-            (token, index) = read_minus(line, index)
-        elif line[index] == '*':
-            (token, index) = read_times(line, index)
-        elif line[index] == '/':
-            (token, index) = read_division(line, index)
-        elif line[index] == '(':
-            (token, index) = read_left_parenthesis(line, index)
+            (num, index) = read_number(line, index)
+            num_queue.append(num)
+        elif line[index] in ('+', '-', '*', '/', '(', 'a', 'i', 'r'):
+            stack.append(line[index])
         elif line[index] == ')':
-            (token, index) = read_right_parenthesis(line, index)
-        elif line[index] == 'a':
-            (token, index) = read_abs(line, index)
-        elif line[index] == 'i':
-            (token, index) = read_int(line, index)
-        elif line[index] == 'r':
-            (token, index) = read_round(line, index)
-        else:
-            print('Invalid character found: ' + line[index])
-            exit(1)
-        tokens.append(token)
-    return tokens
-
-
-def evaluate(tokens):
-    answer = 0
-    tokens.insert(0, {'type': 'PLUS'})  # Insert a dummy '+' token
-    index = 1
-    while index < len(tokens):
-        # かっこの中を再帰的に計算
-        if tokens[index]['type'] == 'LEFT':
-            right_index = find_right_parenthesis(tokens, index)
-            paren_result = evaluate(tokens[index + 1:right_index])
-            tokens[index:right_index +
-                   1] = [{'type': 'NUMBER', 'number': paren_result}]
-        # abs, int, roundの計算
-        elif tokens[index]['type'] in ('ABS', 'INT', 'ROUND'):
-            right_index = find_right_parenthesis(tokens, index + 1)
-            inside_func = evaluate(tokens[index + 2:right_index])
-            if tokens[index]['type'] == 'ABS':
-                func_result = abs(inside_func)
-            elif tokens[index]['type'] == 'INT':
-                func_result = int(inside_func)
-            else:
-                func_result = round(inside_func)
-            tokens[index:right_index +
-                   1] = [{'type': 'NUMBER', 'number': func_result}]
-        else:
-            index += 1
-    index = 1
-    # 掛け算と割り算を優先的に計算
-    while index < len(tokens):
-        if tokens[index]['type'] == 'TIMES' or tokens[index]['type'] == 'DIVISION':
-            left = tokens[index - 1]['number']
-            right = tokens[index + 1]['number']
-            if tokens[index]['type'] == 'TIMES':
-                result = left * right
-            else:
-                if right == 0:
-                    raise ValueError('Division by zero')
-                result = left / right
-            tokens[index - 1:index +
-                   2] = [{'type': 'NUMBER', 'number': result}]
-        else:
-            index += 1
-    index = 1
-    # 足し算と引き算を計算
-    while index < len(tokens):
-        if tokens[index]['type'] == 'NUMBER':
-            if tokens[index - 1]['type'] == 'PLUS':
-                answer += tokens[index]['number']
-            elif tokens[index - 1]['type'] == 'MINUS':
-                answer -= tokens[index]['number']
-            else:
-                print('Invalid syntax')
-                exit(1)
+            operation = []
+            while 1:
+                operation.append(stack.pop())
+                if operation[-1] == '(':
+                    operation.pop()
+                    right = num_queue.pop()
+                    current_operation = operation.pop()
+                    if current_operation in ('+', '-', '*', '/'):
+                        left = num_queue.pop()
+                        ans, index = calculate(
+                            current_operation, left, right, index)
+                    elif current_operation in ('a', 'i', 'r'):
+                        ans, index = calculate(
+                            current_operation, None, right, index)
+                    else:
+                        print('Invalid character found: ' + line[index])
+                        exit(1)
+                    num_queue.append(ans)
         index += 1
-    return answer
+    while stack:
+        num_queue.append(stack.pop())
+    return num_queue, stack
 
 
-def find_right_parenthesis(tokens, index):  # 閉じかっこのindexを検索
-    depth = 0
-    for i in range(index, len(tokens)):
-        if tokens[i]['type'] == 'LEFT':
-            depth += 1
-        elif tokens[i]['type'] == 'RIGHT':
-            depth -= 1
-            if depth == 0:
-                return i
-    raise ValueError('Unmatched parenthesis')
+def evaluate(nums, stack):
+    result_stack = []
+    for token in nums:
+        if isinstance(token, float):
+            result_stack.append(token)
+        elif token in ('+', '-', '*', '/'):
+            b = result_stack.pop()
+            a = result_stack.pop()
+            ans, _ = calculate(token, a, b, 0)
+            result_stack.append(ans)
+        elif token in ('a', 'i', 'r'):
+            a = result_stack.pop()
+            ans, _ = calculate(token, None, a, 0)
+            result_stack.append(ans)
+    return result_stack[0]
 
 
 def test(line):
-    tokens = tokenize(line)
-    actual_answer = evaluate(tokens)
+    nums, stack = shunting_yard_algorithm(line)
+    print("num_queue:", nums)
+    actual_answer = evaluate(nums, stack)
     expected_answer = eval(line)
     if abs(actual_answer - expected_answer) < 1e-8:
         print("PASS! (%s = %f)" % (line, expected_answer))
@@ -203,6 +137,6 @@ run_test()
 while True:
     print('> ', end="")
     line = input()
-    tokens = tokenize(line)
-    answer = evaluate(tokens)
+    nums, stack = shunting_yard_algorithm(line)
+    answer = evaluate(nums, stack)
     print("answer = %f\n" % answer)

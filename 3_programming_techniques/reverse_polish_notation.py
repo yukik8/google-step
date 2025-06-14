@@ -62,7 +62,8 @@ def shunting_yard_algorithm(line):
 def evaluate(stack):
     result_stack = []
     index = 0
-    while index < len(stack):
+    length = len(stack)
+    while index < length:
         print(result_stack)
         if type(stack[index]) in (int, float):
             result_stack.append(stack[index])
@@ -82,7 +83,7 @@ def evaluate(stack):
                 result_stack.append(round(a))
                 index += 4
         index += 1
-        print(result_stack[0])
+        print(result_stack[0], index)
     return result_stack[0]
 
 
@@ -102,21 +103,21 @@ def test(line):
 def run_test():
     print("==== Test started! ====")
     test("1+2")
-    # test("1.0+2.1-3")
+    test("1.0+2.1-3")
 
-    # test("2*3")  # かけ算
-    # test("2/3")  # 割り算
-    # test("2.1*3.3")  # 小数のかけ算
-    # test("2.1/3.3")  # 小数の割り算
-    # test("8.0+3*0.7+0.4")  # 掛け算を優先
-    # test("8.0+3/0.7+0.4")  # 割り算を優先
-    # test("8.0+3*0.7/0.4")  # 連続して掛け算と割り算
-    # test("-9+2")  # マイナス
-    # test("5.5*0")  # ０の掛け算
-    # # test("5.5/0")  # ０の割り算
+    test("2*3")  # かけ算
+    test("2/3")  # 割り算
+    test("2.1*3.3")  # 小数のかけ算
+    test("2.1/3.3")  # 小数の割り算
+    test("8.0+3*0.7+0.4")  # 掛け算を優先
+    test("8.0+3/0.7+0.4")  # 割り算を優先
+    test("8.0+3*0.7/0.4")  # 連続して掛け算と割り算
+    test("-9+2")  # マイナス
+    test("5.5*0")  # ０の掛け算
+    # test("5.5/0")  # ０の割り算
 
-    # test("8.0+3*(0.7+0.4)")  # かっこの含まれる計算
-    # test("(3.0+4*(2-1))/5")  # 二重かっこの含まれる計算
+    test("8.0+3*(0.7+0.4)")  # かっこの含まれる計算
+    test("(3.0+4*(2-1))/5")  # 二重かっこの含まれる計算
 
     test("8.0+3*abs(-0.7+0.4)")  # absの含まれる計算
     test("8.0+3*int(1.1+0.4)")  # intの含まれる計算

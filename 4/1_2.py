@@ -94,21 +94,21 @@ class Wikipedia:
         node = goal_id
         path = []
         while queue:
-            current = queue.popleft()
-            if current == goal_id:
+            current = queue.popleft()   # dequeue
+            if current == goal_id:  # goalを見つけたら終了
                 break
-            for link in self.links[current]:
-                if link not in checked_nodes:
+            for link in self.links[current]:    # currentから辿れるlinkを探索
+                if link not in checked_nodes:   # check済みでなかった場合、check済みに更新してqueueに追加
                     checked_nodes.add(link)
                     queue.append(link)
-                    node_to_root[link] = current
-        while node != start_id:
+                    node_to_root[link] = current    # nodeの親を辞書に保存
+        while node != start_id:  # nodeの親を辿ってpathを再現
             path.append(self.titles[node])
             node = node_to_root[node]
         path.append(self.titles[start_id])
         path.reverse()
         print(f'Shortest path: {path}')
-        return reversed(path)
+        return path
 
         # ------------------------#
 
@@ -180,6 +180,7 @@ class Wikipedia:
     # 'start': A title of the start page.
     # 'goal': A title of the goal page.
 
+    # メモリが大きすぎてクラッシュしてしまう
     def find_longest_path(self, start, goal):
         # ------------------------#
         # Write your code here!  #
@@ -218,13 +219,13 @@ if __name__ == "__main__":
         exit(1)
 
     wikipedia = Wikipedia(sys.argv[1], sys.argv[2])
-    # # Example
-    # wikipedia.find_longest_titles()
-    # # Example
-    # wikipedia.find_most_linked_pages()
+    # Example
+    wikipedia.find_longest_titles()
+    # Example
+    wikipedia.find_most_linked_pages()
     # Homework #1
-    # wikipedia.find_shortest_path("きかんしゃトーマス", "レモネード")
-    # # Homework #2
-    # wikipedia.find_most_popular_pages()
+    wikipedia.find_shortest_path("渋谷", "パレートの法則")
+    # Homework #2
+    wikipedia.find_most_popular_pages()
     # # Homework #3 (optional)
-    wikipedia.find_longest_path("渋谷", "池袋")
+    # wikipedia.find_longest_path("渋谷", "池袋")

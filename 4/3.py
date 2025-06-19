@@ -67,30 +67,43 @@ class Wikipedia:
         longest_path = []
         current = start_id
         path = [start_id]
+        node_to_root = {start_id: None}
+        depth = {start_id: 1}
         checked_nodes = set([start_id])
-        stack = [(start_id, path, checked_nodes)]
+        stack = [(start_id, 1, checked_nodes)]
         ver = 0
         while stack:
-            current, path, checked_nodes = stack.pop()
+            current, d, checked_nodes = stack.pop()
             if current == goal_id:
-                if len(path) > len(longest_path):   # 現在見たpathが最長の場合longestを現在のものに更新
+                if d > len(longest_path):   # 現在見たpathが最長の場合longestを現在のものに更新
                     ver += 1
-                    longest_path = path
-                    print(ver)
-                    if ver == 9:    # 10個目を試すときにクラッシュしてしまうため一旦、９回で止める
-                        break
+                    # パス復元
+                    path = []
+                    node = goal_id
+                    while node is not None:
+                        path.append(node)
+                        node = node_to_root[node]
+                    longest_path = list(reversed(path))
+                    print(ver, len(longest_path), len(stack))
+                    # if ver == 9:    # 10個目を試すときにクラッシュしてしまうため一旦、９回で止める
+                    #     break
                 continue
-            # 次につながるリンクが多い順にneighbourを並べてTOP3まで検索する
-            three_neighbours = sorted(self.links[current], key=lambda x: len(
-                self.links[x]), reverse=True)
+
+            # 次につながるリンクが多い順にneighbourを並べてTOP5まで検索する
+            # three_neighbours = sorted(self.links[current], key=lambda x: len(
+            #     self.links[x]) + sum(len(self.links[n]) for n in self.links[x]), reverse=True)
+                # 2階層のリンク数を数えようとしたけど精度が落ちた
+            five_neighbours = sorted(
+                self.links[current], key=lambda x: len(self.links[x]), reverse=True)
             i = 0
-            for neighbour in three_neighbours:
+            for neighbour in five_neighbours:
                 if neighbour not in checked_nodes and neighbour in nodes:
                     i += 1
                     new_checked_nodes = checked_nodes | {neighbour}
-                    new_path = path + [neighbour]  # pathにneighbourを追加した新しいリスト
-                    stack.append((neighbour, new_path, new_checked_nodes))
-                    if i >= 3:
+                    node_to_root[neighbour] = current
+                    depth[neighbour] = d + 1
+                    stack.append((neighbour, d + 1, new_checked_nodes))
+                    if i >= 5:  # 上位5つのみ探索
                         break
         return longest_path
 

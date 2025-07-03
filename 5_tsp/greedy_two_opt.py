@@ -22,17 +22,24 @@ def near_list(dist):
 
 def two_opt(tour: list[int], dist: list[list[int]]):
     near = near_list(dist)
-    for i in range(len(tour)-2):
-        for j in near[tour[i+1]]:
-            if j <= i + 1 or j + 2 > len(tour):
-                continue
-            else:
-                current_dist = dist[tour[i]][tour[i+1]] + \
-                    dist[tour[j]][tour[j+1]]
-                comparison_dist = dist[tour[i]][tour[j]] + \
-                    dist[tour[i+1]][tour[j+1]]
-                if current_dist > comparison_dist:
-                    tour[i+1:j+1] = reversed(tour[i+1:j+1])
+    improved = True
+    while improved:
+        improved = False
+        for i in range(len(tour)-2):
+            for j in near[tour[i+1]]:
+                if j <= i + 1 or j + 2 > len(tour):
+                    continue
+                else:
+                    current_dist = dist[tour[i]][tour[i+1]] + \
+                        dist[tour[j]][tour[j+1]]
+                    comparison_dist = dist[tour[i]][tour[j]] + \
+                        dist[tour[i+1]][tour[j+1]]
+                    if current_dist > comparison_dist:
+                        tour[i+1:j+1] = reversed(tour[i+1:j+1])
+                        improved = True
+                        break
+            if improved:
+                break
     return tour
 
 
